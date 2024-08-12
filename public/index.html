@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Trading Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #dashboard {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: 600px;
+            width: 600px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #info, #actions {
+            width: 45%;
+        }
+
+        .info {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        #log {
+            margin-top: 20px;
+            background: #eee;
+            padding: 10px;
+            border-radius: 8px;
+            height: 400px;
+            overflow-y: auto;
+            font-size: 14px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard">
+        <div id="info">
+            <h1>Thông tin giá</h1>
+            <div class="info" style="font-weight: bold;">Giá hiện tại: <span id="currentPrice" style="color: red;">0.00</span> USD</div>
+            <div class="info">Upper Band: <span id="upperBand">0.00</span> USD</div>
+            <div class="info">Lower Band: <span id="lowerBand">0.00</span> USD</div>
+            <div class="info" style="font-weight: bold;">Giá bán cần thiết để có lãi: <span id="minSellPrice" style="color: blue;">0.00</span> USD</div>
+            <div class="info" style="font-weight: bold;">Giá mua cần thiết để có lãi: <span id="maxBuyPrice" style="color: green;">0.00</span> USD</div>
+        </div>
+        <div id="actions">
+            <h1>Hành động</h1>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('priceUpdate', (data) => {
+            document.getElementById('currentPrice').innerText = data.price.toFixed(4);
+            document.getElementById('upperBand').innerText = data.upperBand.toFixed(4);
+            document.getElementById('lowerBand').innerText = data.lowerBand.toFixed(4);
+            document.getElementById('minSellPrice').innerText = data.minSellPrice.toFixed(4);
+            document.getElementById('maxBuyPrice').innerText = data.maxBuyPrice.toFixed(4);
+        });
+
+        socket.on('tradeAction', (action) => {
+            const logDiv = document.getElementById('log');
+            const now = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div>[${now}] ${action}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        });
+    </script>
+</body>
+</html>
